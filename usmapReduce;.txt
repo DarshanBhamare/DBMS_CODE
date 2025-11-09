@@ -1,0 +1,27 @@
+use mapReduce;
+
+db.sales.insertMany([
+   { _id: 1, product: "Pen", quantity: 5 },
+   { _id: 2, product: "Book", quantity: 10 },
+   { _id: 3, product: "Pen", quantity: 3 },
+   { _id: 4, product: "Pencil", quantity: 7 },
+   { _id: 5, product: "Book", quantity: 6 }
+ ]);
+
+var mapFunction = function() {
+   emit(this.product, this.quantity)
+};
+
+var reduceFunction = function(key, values) {
+   return Array.sum(values);
+};
+
+db.sales.mapReduce(
+   mapFunction,
+   reduceFunction,
+   {
+     out: "total_sales"
+   }
+ );
+
+ db.total_sales.find().pretty();
