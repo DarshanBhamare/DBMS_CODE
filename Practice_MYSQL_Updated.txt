@@ -1,0 +1,197 @@
+(Perform on MYSQL Terminal)
+teaches(T_ID, course_id, sec_id, semester, year)
+student(S_ID, name, dept_name, tot_cred)
+instructor(T_ID, name, dept_name, salary)
+course(course_id, title, dept_name, credits)
+i. Find the names of all instructor whose salary is greater than 25000.
+ii. Update Instructor dept_name from CSE to IT
+iii. Create Simple Index on course table on the attribute dept_name and find out
+department wise courses.
+iv. Create a View to retrieve data of instructor with details of course, section,
+semester and year he conducted lectures on
+
+
+create table student(S_ID int,name varchar(20),dept_name varchar(20),tot_cred int);
+
+create table instructor(T_ID varchar(20),name varchar(20),dept_name varchar(20),salary int);
+
+create table course(course_id varchar(20),title varchar(20),dept_name varchar(20), credits int);
+
+create table teaches(T_ID int,course_id varchar(20),sec_id varchar(20),semester varchar(20),year int);
+
+
+1)select t.semester ,i.name from teaches t join instructor i on t.T_ID=i.T_ID order by t.semester;
+
+2)create view student_details as select * from student ;
+
+3)alter table student rename column dept_name to department_name;
+
+4)delete from student where department_name is NULL;
+
+
+***********************************************************************
+(Perform on MYSQL Terminal)
+teaches(T_ID, course_id, sec_id, semester, year)
+student(S_ID, name, dept_name, tot_cred)
+instructor(T_ID, name, dept_name, salary)
+course(course_id, title, dept_name, credits)
+i. Find the names of all instructor whose salary is greater than 25000.
+ii. Update Instructor dept_name from CSE to IT
+iii. Create Simple Index on course table on the attribute dept_name and find out
+department wise courses.
+iv. Create a View to retrieve data of instructor with details of course, section,
+semester and year he conducted lectures on.
+
+1) select name ,salary from instructor where salary>25000;
+2)update instructor set dept_name='IT' where dept_name='CSE';
+3)create index idx_name on course(dept_name)  and  select dept_name,group_concat(title separator ',') as courses from course group by dept_name;
+4)create view intr as select c.title,t.course_id,t.sec_id,t.semester,t.year,i.name from teaches t join instructor i on t.T_ID=i.T_ID join course c on t.course_id=c.course_id;
+*******************************************************************************
+(Perform on MYSQL Terminal)
+teaches(T_ID,course_id,sec_id,semester,year)
+section(course_id,sec_id,semester,year,building,room_no)
+instructor(T_ID,name, dept_name,salary)
+course(course_id,title,dept_name,credits)
+i. Display the name of the instructor whose salary is between 30000 and 60000 in
+descending order.
+ii. Find the average, minimum, maximum salary in each department.
+iii. Display the name of the instructor, his department name and salary who teaches
+the course_id: 101
+iv. Find the name of the instructor whose average salary in greater then 60000.
+
+1)select name,salary from instructor where salary between 90000 and 100000 order by salary desc;
+2)select dept_name,max(salary) as mx_salary,min(salary) as mn_salary ,avg(salary) as avg_salary from instructor group by dept_name;
+3)select i.name,i.dept_name,i.salary,i.T_ID,c.course_id from instructor i join course c on i.dept_name=c.dept_name where c.course_id=101;
+4)select name,dept_name,salary from instructor where salary>60000;
+*********************************************************************************
+
+(Perform on MYSQL Terminal)
+student(S_ID,name,dept_name,tot_cred)
+instructor(T_ID,name,dept_name,salary)
+course(course_id,title,dept_name,credits)
+i. Find the average salary of instructor in those departments where the average salary is more
+than Rs. 42000/-.
+ii. Increase the salary of each instructor in the computer department by 10%.
+iii. Find the names of instructors whose names are neither „Amol‟ nor „Amit‟.
+iv. Find the names of student which contains „am‟ as its substring.
+v. Find the name of students from computer department that “DBMS” courses they take
+
+1)select dept_name,avg(salary) as avg_salary from instructor group by dept_name  having avg(salary)>42000;
+2)update instructor set salary=salary*1.10 where dept_name='CSE';
+3)select name from instructor where name not in('Amol','Amit');
+4)select name from student  where name like '%am%';
+5) select * from student s join course c on c.dept_name=s.department_name where c.dept_name='CSE' and c.title='Database Systems';
+********************************************************************************************
+
+(Perform on MYSQL Terminal)
+teaches(T_ID,course_id,sec_id,semester,year)
+student(S_ID,name,dept_name,tot_cred)
+instructor(T_ID,name,dept_name,salary)
+course(course_id,title,dept_name,credits)
+i.Find the total number of instructor who teach a course in the First semester 2010.
+ii.Find the names of all instructors from computer department whose name includes the
+substring „shree‟.
+iii.Find the names of all instructor that have a salary greater than average salary of the
+Civil Department.
+iv. Find the set of all courses taught either in Fifth semester 2014 or in First semester 2010
+or both.
+
+1) select count(distinct T_ID) as di from teaches t where semester='Fall' and year=2023;
+2)select * from instructor where dept_name='IT' and name like '%shree%';
+3)select * from instructor where salary>(select avg(salary) as avg_s from instructor where dept_name='CIVIL');
+4)select c.title,t.semester,t.year from teaches t join course c on t.course_id=c.course_id where (t.semester='Fifth' and t.year=2014) or (t.semester='First' and t.year=2010);
+
+or for 4 query 
+SELECT DISTINCT course_id
+FROM teaches
+WHERE (semester = 'Fifth' AND year = 2014)
+   OR (semester = 'First' AND year = 2010);
+
+***************************************************************************
+(Perform on MYSQL Terminal)
+Emp(emp_id,ename, street, city)
+works(emp_id,c_id,ename, cname, sal)
+Company(c_id,cname, city)
+Manager(mgr_id, mgrname)
+i. Modify the database so that a particular company (eg. ABC) now in Pune
+ii. Give all managers of Mbank a 10% raise. If salary is >20,000, give only 3% raise.
+iii. Find out the names of all the employees who works in „Bosch‟ company in city Pune
+iv. Delete all records in the works table for employees of a particular company (Eg,
+SBC Company) whose salary>50,000.
+
+1)update company set city='pune' where cname='Google';
+2)UPDATE works
+	SET sal = CASE
+             	WHEN sal > 20000 THEN sal * 1.03
+             	ELSE sal * 1.10
+          	END
+	WHERE cname = 'Mbank'
+  	AND emp_id IN (SELECT mgr_id FROM Manager);
+3)select e.ename from emp e join works w on e.emp_id=w.emp_id join company c on w.c_id=c.c_id where c.cname='TCS' and c.city='Mumbai';
+4)DELETE FROM works
+WHERE cname = 'SBC'
+  AND sal > 50000;
+
+****************************************************************************************************
+(Perform on MYSQL Terminal)
+Empl(e_no, e_name, post, pay_rate)
+Position(pos_no, post)
+Duty-alloc (pos_no, e_no, month,year, shift)
+Implement the following SQL queries
+i. Get duty allocation details for e_no 123 for the first shift in the month of April 2003
+ii. Get the employees whose rate of pay is > or equal rate of pay of employees 'Sachin'.
+iii. Create a view for displaying minimum, maximum and average salary for all the
+posts.
+iv. Get a count of different employees on each shift having post „manager‟
+
+1)SELECT *
+FROM Duty_alloc
+WHERE e_no = 102
+  AND shift = 'First'
+  AND month = 'April'
+  AND year = 2003;
+
+2)SELECT e_name, pay_rate
+FROM Empl
+WHERE pay_rate >= (
+    SELECT pay_rate
+    FROM Empl
+    WHERE e_name = 'Sachin'
+);
+3)CREATE VIEW post_salary_stats AS
+SELECT post,
+       MIN(pay_rate) AS min_salary,
+       MAX(pay_rate) AS max_salary,
+       AVG(pay_rate) AS avg_salary
+FROM Empl
+GROUP BY post;
+4)SELECT d.shift,
+       COUNT(DISTINCT d.e_no) AS total_employees
+FROM Duty_alloc d
+JOIN Empl e ON d.e_no = e.e_no
+WHERE e.post = 'Manager'
+GROUP BY d.shift;
+**************************************************************************************************************
+Design and Develop SQL DDL statements which demonstrate the use of SQL objects such as
+Table, View, Index using Client-Data sever(two tier)
+Employee(e_no, e_name, post, pay_rate)
+Position(pos_no, post)
+Duty-alloc (pos_no, e_no, month,year, shift)
+i. Create view that displays first three columns of employee table.
+ii. Create view that displays left outer joins on employee and Position tables on post criteria.
+iii. Create index on pos_no attribute of Position table.
+iv. Based on indexed column fire the queries.
+
+1)CREATE VIEW emp_view1 AS
+SELECT e_no, e_name, post
+FROM Employee;
+
+2)CREATE VIEW emp_pos_view AS
+SELECT e.e_no, e.e_name, e.post, p.pos_no
+FROM Employee e
+LEFT OUTER JOIN Position p
+ON e.post = p.post;
+
+3)CREATE INDEX idx_posno ON Position(pos_no);
+4) SELECT * FROM Position WHERE pos_no = 2;
+

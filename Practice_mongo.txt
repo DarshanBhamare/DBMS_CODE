@@ -1,0 +1,178 @@
+Collection “city” which contains the documents given as below(Perform on Mongo Terminal)
+{
+city: “pune”,
+type: “urban”,
+state: “MH”,
+population: 5600000
+}
+
+Q)using mapreduce, find citywise population
+
+db.pop.insertMany([{city:'pune',type:'urban',state:'mh',pop:12},{city:'nashik',type:'obc',state:'mh',pop:15},{city:'pune',type:'urban',state:'mh',pop:20},{city:'nashik',type:'obc',state:'mh',pop:4}]);
+
+var mapFunction=function(){emit(this.city,this.pop)};
+
+ var reduceFunction=function(key,values){return Array.sum(values)};
+
+ db.pop.mapReduce(mapFunction,reduceFunction,{out:"total"});
+
+db.total.find();
+
+*****************************************************************************************
+
+Collection “books” which contains the documents given as below(Perform on Mongo
+Terminal)
+{
+name: “understanding JAVA”
+pages:400
+}
+-using MapReduce, categerize books into small books and big books, based on number of
+pages display and categorize total number of books.
+
+use library;
+
+db.books.insertMany([
+  { name: "Understanding JAVA", pages: 400 },
+  { name: "Learning Python", pages: 150 },
+  { name: "C++ in Depth", pages: 220 },
+  { name: "Data Structures", pages: 550 },
+  { name: "MongoDB Guide", pages: 320 },
+  { name: "AI Basics", pages: 120 }
+]);
+
+var mapFunction = function() {
+  if (this.pages <= 300)
+    emit("Small Books", 1);
+  else
+    emit("Big Books", 1);
+};
+
+var reduceFunction = function(key, values) {
+  return Array.sum(values);
+};
+
+db.books.mapReduce(
+  mapFunction,
+  reduceFunction,
+  { out: "book_category" }
+);
+
+***********************************************************************************************************************
+Collection “movies” which contains the documents given as below(Perform on Mongo
+Terminal)
+{
+name: “Movie1”
+type: “action”
+budget:1000000
+producer:{
+name: “producer1”
+address: “PUNE”
+}
+}
+i. Find the name of the movie having budget greater than 1,00,000.
+ii. Find the name of producer who lives in Pune
+iii. Update the type of movie “action” to “horror”
+iv. Find all the documents produced by name “producer1” with their address
+
+1)db.movies.find({budget:{$gt:100000}})
+2)db.movies.find({"producer.address":"pune"},{_id:0,"producer.name":1})
+3)db.movies.updateMany({type:'action'},{$set:{type:'horror'}});
+4)db.movies.find({"producer.address":"pune"},{_id:0,"producer.name":1})
+************************************************************************************************************************************
+Collection “orderinfo” which contains the documents given as below(Perform on Mongo
+Terminal)
+{
+cust_id:123
+cust_name: “abc”,
+status: “A”,
+price: 250
+}
+i. Find the total price for each customer and display in the order of total price.
+ii. Find the distinct customer names
+iii. Display the “price” of customers whose status is 'A'
+iv. Delete the customers whose status is 'A'
+
+1)db.orderinfo.aggregate([{$group:{_id:'$cust_name',price:{$sum:'$price'}}}])
+2)db.orderinfo.distinct("cust_name");
+3) db.orderinfo.find({status:'a'},{_id:0,price:1})
+4)db.orderinfo.deleteMany({status:'a'})
+**********************************************************************************************************************************
+
+Collection “orderinfo” which contains the documents given as below(Perform on Mongo
+Terminal)
+{
+cust_id:123
+cust_name:”abc”
+status:”A”
+price:250
+}
+i. find the average price for each customers having status 'A'
+ii. Display the status of the customers whose amount/price lie between 100 and 1000
+iii. Display the customers information without “_id” .
+iv. create a simple index on onderinfo collection and fire the queries. Also explain the impact
+of index before and after.
+
+
+1)db.orderinfo.aggregate({$match:{status:'a'}},{$group:{_id:'$cust_name',average:{$avg:'$price'}}})
+2)db.orderinfo.find({price:{$gt:100,$lt:1000}},{_id:0,status:1})
+3)db.orderinfo.find({},{_id:0});
+4)db.orderinfo.createIndex({price:1});
+	db.orderinfo.find({price:350}).explain('executionStats')
+***************************************************************************************************************************************
+Collection “orderinfo” which contains the documents given as below(Perform on Mongo
+Terminal)
+{
+cust_id:123
+cust_name:”abc”
+status:”A”
+price:250
+}
+i. Add “Age” field to the orderinfo collection
+ii. Create the complex index on orderinfo collection and fire the queries and drop the
+duplicates.
+iii. Display the average price for each customer group by status
+iv. Change the customer‟s name whose status is “B
+
+1) db.orderinfo.updateMany({},{$set:{age:25}})
+2)db.orderinfo.createIndex({price:1,status:-1})
+3)db.orderinfo.aggregate([{$group:{_id:'$status',average:{$avg:'$price'}}}])
+4) db.orderinfo.updateMany({status:'b'},{$set:{cust_name:'darshan'}})
+**********************************************************************************************************
+Collection “orderinfo” which contains the documents given as below(Perform on Mongo
+Terminal)
+{
+cust_id:123
+cust_name:”abc”
+status:”A”
+price:250
+}
+i. Display the name of the customer having the price between 250 and 450
+ii. Increment the price by 10 for cust_id: 123 and decrement the price by 5 for
+cust_id: 124
+iii. Remove any one of the field from the orderinfo collection.
+iv. Find the name of the customer whose status is either A or price is 250 or both
+
+1)db.orderinfo.find({price:{$lt:450,$gt:250}},{_id:0,cust_name:1});
+2)db.orderinfo.updateMany({cust_id:123},{$inc:{price:10}})   and     db.orderinfo.updateMany({cust_id:124},{$inc:{price:-5}})
+3)db.orderinfo.updateMany({},{$unset:{age:""}})
+4)db.orderinfo.find({$or:[{status:'a',price:250}]})
+*************************************************************************************************************************************
+
+Collection “orderinfo” which contains the documents given as below(Perform on Mongo
+Terminal)
+{
+cust_id:123
+cust_name:”abc”
+status:”A”
+price:250
+}
+i. Find the total price for each customer and display in the order of total price.
+ii. Display the average price for each customer group by status
+iii. Create simple index on orderinfo collection.
+iv. Create the complex index on orderinfo collection and fire the queries and drop the
+duplicates
+
+1)db.orderinfo.aggregate([{$group:{_id:"$cust_name",total:{$sum:"$price"}}},{$sort:{total:1}}]);
+2) db.orderinfo.aggregate({$group:{_id:'$cust_name',average:{$avg:'$price'}}})
+3) db.orderinfo.createIndex({price:1})
+4)db.orderinfo.createIndex({price:1,status:-1})

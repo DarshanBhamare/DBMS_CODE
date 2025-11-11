@@ -1,0 +1,49 @@
+SET SERVEROUTPUT ON;
+CREATE TABLE library_table (
+    book_name VARCHAR2(20),
+    status    VARCHAR2(20)
+);
+
+INSERT INTO library_table VALUES ('DBMS', 'AVAILABLE');
+INSERT INTO library_table VALUES ('CNS', 'UNAVAILABLE');
+INSERT INTO library_table VALUES ('SPOS', 'AVAILABLE');
+INSERT INTO library_table VALUES ('TOC', 'AVAILABLE');
+
+
+CREATE TABLE library_audit (
+    date_modified DATE,
+    book_name     VARCHAR2(20),
+    old_status    VARCHAR2(20),
+    new_status    VARCHAR2(20),
+    action        VARCHAR2(20)
+);
+
+CREATE OR REPLACE TRIGGER trg_library_after_row
+AFTER INSERT OR UPDATE OR DELETE
+ON library_table
+FOR EACH ROW
+BEGIN
+    IF INSERTING THEN
+        dbms_output.put_line(:NEW.book_name || ' INSERTING');
+        INSERT INTO library_audit
+        VALUES (SYSDATE, :NEW.book_name, NULL, :NEW.status, 'INSERT');
+        
+    ELSIF UPDATING THEN
+        dbms_output.put_line(:OLD.book_name || ' UPDATING');
+        INSERT INTO library_audit
+        VALUES (SYSDATE, :OLD.book_name, :OLD.status, :NEW.status, 'UPDATE');
+        
+    ELSIF DELETING THEN
+        dbms_output.put_line(:OLD.book_name || ' DELETING');
+        INSERT INTO library_audit
+        VALUES (SYSDATE, :OLD.book_name, :OLD.status, NULL, 'DELETE');
+    END IF;
+END;
+/
+
+
+SET SERVEROUTPUT ON;
+
+INSERT INTO library_table VALUES ('M1', 'AVAILABLE');
+UPDATE library_table SET status = 'UNAVAILABLE' WHERE book_name = 'M1';
+DELETE FROM library_table WHERE book_name = 'M1';

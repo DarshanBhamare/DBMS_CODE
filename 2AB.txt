@@ -1,0 +1,218 @@
+1.
+CREATE TABLE Persons (
+         id INT NOT NULL,
+         name VARCHAR(50) NOT NULL,
+        age INT NOT NULL,
+         salary DECIMAL(10,2) NOT NULL
+     );
+2.
+DESC Persons;
+3.
+INSERT INTO Persons (id, name, age, salary)
+     VALUES
+    (1, 'Rajesh', 30, 25000),
+    (2, 'Mahesh', 35, 30000),
+     (3, 'Rohit', 26, 28000),
+     (4, 'Sneha', 28, 45000),
+     (5, 'Amit', 40, 15000);
+4.
+SELECT * FROM Persons;
+5.
+UPDATE Persons
+    SET salary = 35000
+     WHERE id = 2;
+6.
+DELETE FROM Persons
+     WHERE id = 2;
+7.
+SELECT id, name
+    FROM Persons
+    WHERE salary > 27000;
+8.
+SELECT name, salary
+    FROM Persons
+    WHERE salary < 27000;
+9.
+SELECT *
+    FROM Persons
+    WHERE salary > 27000 AND salary < 40000;
+10.
+SELECT *
+     FROM Persons
+    WHERE salary BETWEEN 27000 AND 40000;
+11.
+SELECT *
+     FROM Persons
+     LIMIT 3;
+12.
+SELECT *
+     FROM Persons
+    WHERE age = 35
+    LIMIT 3;
+13.
+SELECT *
+     FROM Persons
+     WHERE age = 26 AND salary < 35000;
+14.
+SELECT *
+     FROM Persons
+     WHERE age = 26 OR salary < 35000;
+15.
+SELECT *
+     FROM Persons
+     WHERE age <> 26;
+16.
+ALTER TABLE Persons
+     ADD city VARCHAR(50);
+17.
+UPDATE Persons
+     SET city = 'Nashik'
+     WHERE salary < 30000;
+18.
+UPDATE Persons
+    SET city = 'Pune'
+    WHERE salary BETWEEN 30000 AND 54000;
+19.
+UPDATE Persons
+     SET city = 'Mumbai'
+     WHERE salary > 55000;
+20.
+SELECT *
+     FROM Persons
+    WHERE city IN ('Pune', 'Nashik');
+21.
+SELECT *
+     FROM Persons
+     WHERE city NOT IN ('Pune', 'Nashik');
+22.
+SELECT *
+     FROM Persons
+    ORDER BY salary ASC;
+23.
+SELECT *
+     FROM Persons
+     ORDER BY salary DESC;
+24.
+SELECT *
+     FROM Persons
+     WHERE name LIKE 'R%';
+25.
+SELECT *
+    FROM Persons
+    WHERE name LIKE 'm%';
+26.
+SELECT *
+     FROM Persons
+     WHERE name LIKE '%am%';
+27.
+SELECT *
+    FROM Persons
+     WHERE name LIKE '_a%';
+28.
+SELECT *
+     FROM Persons
+     WHERE name LIKE 'A%' AND LENGTH(name) >= 4;
+29.
+SELECT *
+    FROM Persons
+     WHERE name LIKE 'S%m';
+30.
+CREATE INDEX idx_city ON Persons(city);
+31.
+SELECT city, COUNT(*) AS total_persons
+     FROM Persons
+    GROUP BY city;
+32.
+CREATE VIEW Pune_Rich AS
+     SELECT id, name, salary
+     FROM Persons
+     WHERE city = 'Pune' AND salary > 40000;
+33.
+SELECT 
+        COUNT(*) AS total_persons,
+         MAX(salary) AS max_salary,
+        MIN(salary) AS min_salary,
+        SUM(salary) AS total_salary,
+         AVG(salary) AS avg_salary
+     FROM Persons;
+
+
+2B
+
+CREATE TABLE Employee_Details (
+        EMPNO INT NOT NULL,
+       ENAME VARCHAR(10),
+        DATE_OF_JOINING DATE,
+        SAL_NUMBER DECIMAL(7,2),
+        DEPTNAME VARCHAR(10),
+         PRIMARY KEY (EMPNO)
+     );
+
+
+
+INSERT INTO Employee_Details VALUES
+(1001, 'Rajesh', '1978-06-15', 12000, 'IT'),
+(1002, 'Mahesh', '1981-09-20', 9000, 'HR'),
+(1003, 'Rohit', '1985-12-10', 15000, 'Finance'),
+(1004, 'Suresh', '1975-01-01', 8000, 'IT'),
+(1005, 'Amit', '1980-03-22', 9500, 'Marketing'),
+(1006, 'Vikas', '1979-07-17', 13000, 'Finance'),
+(1007, 'Pravin', '1981-11-30', 11000, 'HR'),
+(1008, 'Anil', '1977-05-05', 14000, 'IT'),
+(1009, 'Sunil', '1980-09-09', 10000, 'Finance'),
+(1010, 'Rakesh', '1983-04-25', 10500, 'Marketing'),
+(1011, 'Pooja', '1982-02-19', 12500, 'HR'),
+(1012, 'Priya', '1984-08-28', 11500, 'IT'),
+(1013, 'Neha', '1976-06-03', 8500, 'Finance'),
+(1014, 'Anita', '1978-12-16', 9200, 'Marketing'),
+(1015, 'Prashant', '1981-07-11', 9800, 'HR');
+
+
+
+1.
+SELECT * FROM Employee_Details;
+2.
+SELECT DISTINCT DEPTNAME FROM Employee_Details;
+3.
+SELECT * FROM Employee_Details ORDER BY SAL_NUMBER ASC;
+4.
+SELECT * FROM Employee_Details
+     WHERE DATE_OF_JOINING < '1981-01-01';
+5.
+ SELECT * FROM Employee_Details
+     WHERE YEAR(DATE_OF_JOINING) = 1981;
+6.
+SELECT AVG(SAL_NUMBER) AS Average_Salary FROM Employee_Details;
+7.
+SELECT MIN(SAL_NUMBER) AS Min_Salary, MAX(SAL_NUMBER) AS Max_Salary FROM Employee_Details;
+8.
+SELECT * FROM Employee_Details WHERE ENAME LIKE 'P%';
+9.
+SELECT * FROM Employee_Details WHERE ENAME LIKE '%a';
+10.
+SELECT MAX(SAL_NUMBER) AS Second_Highest
+     FROM Employee_Details
+     WHERE SAL_NUMBER < (SELECT MAX(SAL_NUMBER) FROM Employee_Details);
+11.
+SELECT * FROM Employee_Details
+     WHERE SAL_NUMBER >= 10000
+     ORDER BY DEPTNAME;
+12.
+SELECT DEPTNAME, ENAME, SAL_NUMBER
+     FROM Employee_Details e
+     WHERE SAL_NUMBER = (
+        SELECT MAX(SAL_NUMBER)
+        FROM Employee_Details
+        WHERE DEPTNAME = e.DEPTNAME
+    );
+13.
+UPDATE Employee_Details
+    SET SAL_NUMBER = SAL_NUMBER * 1.10;
+14.
+SELECT ENAME AS Employee_Name, SAL_NUMBER AS Salary FROM Employee_Details;
+
+
+
+
+
+

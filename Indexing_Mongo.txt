@@ -1,0 +1,72 @@
+use index;
+
+db.product.insertMany([
+ { ctype: 'p', item: 'Coke',  amount: 40, customer: 'Darshan' },
+   { ctype: 'q', item: 'chocolate',  amount: 20, customer: 'Lalit' },
+ { ctype: 'p', item: 'chocolate',   amount: 40, customer: 'Rohit' },
+ { ctype: 'q', item: 'cream',  amount: 80, customer: 'Mayur' },
+{ ctype: 'q', item: 'Coke',    amount: 100, customer: 'Sara' },
+   {  ctype: 'p', item: 'kit-kat',  amount: 10, customer: 'Rahul' }])
+
+
+db.product.find({ amount:10 }).explain("executionStats")
+
+db.product.createIndex ({ amount: 1 })
+
+
+db.product.find({ amount:10 }).explain("executionStats")
+
+db.product.createIndex({ amount:1,item:1 })
+
+
+**Aggreagation***
+
+Q).Find total amount of money spent by each customer
+
+db.product.aggregate([
+  { $group: { _id: "$customer", totalAmountSpent: { $sum: "$amount" } } }
+ ])
+
+Q)Find total number of products purchased by customer
+db.product.aggregate([
+   { $group: { _id: "$customer", totalProductsPurchased: { $sum: 1 } } }
+ ])
+
+Q)  Find maximum amount of product purchased by each customer
+
+db.product.aggregate([
+   { $group: { _id: "$customer", maxAmountPurchased: { $max: "$amount" } } }
+ ])
+
+Q)Find minimum amount of product purchased by each customer
+
+db.product.aggregate([
+  { $group: { _id: "$customer", minAmountPurchased: { $min: "$amount" } } }
+ ])
+
+
+Q) Show total amount earned by each product
+
+db.product.aggregate([
+   { $group: { _id: "$item", totalAmountEarned: { $sum: "$amount" } } }
+])
+
+Q) Display product-wise sell
+
+db.product.aggregate([
+  { $group: { _id: "$item", totalSold: { $sum: 1 } } }
+ ])
+
+Q) Find total amount paid by each customer in descending order
+
+db.product.aggregate([
+ { $group: { _id: "$customer", totalAmountPaid: { $sum: "$amount" } } },
+  { $sort: { totalAmountPaid: -1 } }
+ ])
+
+Q) Find amount of Items purchased by customer having ctype as p 
+
+db.product.aggregate([
+  { $match: { ctype: 'p' } },
+  { $group: { _id: "$customer", itemsPurchased: { $sum: 1 } } }
+])

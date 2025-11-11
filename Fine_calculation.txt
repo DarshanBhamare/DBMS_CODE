@@ -1,0 +1,94 @@
+-- 0) Turn on DBMS output so you can see printed messages
+SET SERVEROUTPUT ON;
+/
+-- 1) Drop existing tables (safe to run every time)
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TABLE Fine';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TABLE Borrower';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+-- 2) Create tables (structure matches your usage)
+CREATE TABLE Borrower (
+  Roll_Number   NUMBER PRIMARY KEY,
+  Name          VARCHAR2(50),
+  Date_of_Issue DATE,
+  Book_Name     VARCHAR2(100),
+  Status        CHAR(1)   -- 'i' for issued, 'r' for returned
+);
+
+CREATE TABLE Fine (
+  Roll_No   NUMBER,
+  Sys_Date  DATE,
+  Fine      NUMBER
+);
+
+-- 3) Insert sample data (use explicit TO_DATE)
+INSERT INTO Borrower VALUES(1, 'Aditya',  TO_DATE('18-07-25','DD-MM-RR'), 'CNS',  'i');
+INSERT INTO Borrower VALUES(2, 'Borhade', TO_DATE('15-07-25','DD-MM-RR'), 'DBMS', 'i');
+INSERT INTO Borrower VALUES(3, 'Rohan',   TO_DATE('15-08-25','DD-MM-RR'), 'TOC',  'i');
+INSERT INTO Borrower VALUES(4, 'Tejas',   TO_DATE('29-07-25','DD-MM-RR'), 'SPOS', 'i');
+INSERT INTO Borrower VALUES(5, 'Mahesh',  TO_DATE('24-08-25','DD-MM-RR'), 'SPOS2','i');
+
+COMMIT;
+
+-- 4) PL/SQL block: calculates fine and updates tables (matches your logic)
+DECLARE
+  rollno      NUMBER;
+  name1       VARCHAR2(100);
+  amt         NUMBER := 0;
+  doi         DATE;
+  system_date DATE;
+  no_of_days  NUMBER;
+BEGIN
+  rollno := &Roll_Number;        -- substitution variable (enter roll number when prompted)
+  name1  := '&name';             -- substitution variable (enter book name when prompted)
+
+  SELECT SYSDATE INTO system_date FROM dual;
+
+  SELECT Date_of_Issue
+    INTO doi
+    FROM Borrower
+   WHERE Roll_Number = rollno
+     AND Book_Name = name1;
+
+  dbms_output.put_line('Date of Issue: ' || TO_CHAR(doi, 'DD-MON-YYYY'));
+
+  no_of_days := TRUNC(system_date) - TRUNC(doi);
+  dbms_output.put_line('No of days: ' || no_of_days);
+
+  -- YOUR FINE RULES (keeps your original logic)
+  IF no_of_days > 15 AND no_of_days < 30 THEN
+    amt := no_of_days * 5;
+    dbms_output.put_line('Fine calculated (15-29 days rule): ' || amt);
+  ELSIF no_of_days > 30 THEN
+    amt := no_of_days * 50;
+    dbms_output.put_line('Fine calculated (>30 days rule): ' || amt);
+  ELSE
+    dbms_output.put_line('No fine');
+  END IF;
+
+  IF no_of_days > 15 THEN
+    INSERT INTO Fine VALUES(rollno, system_date, amt);
+    UPDATE Borrower SET Status = 'r' WHERE Roll_Number = rollno;
+    COMMIT;
+    dbms_output.put_line('Inserted fine and updated borrower status to ''r''.');
+  END IF;
+
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    dbms_output.put_line('NO_DATA_FOUND: record not found for Roll Number ' || rollno || ' and Book ' || name1);
+  WHEN OTHERS THEN
+    dbms_output.put_line('Unexpected error: ' || SQLERRM);
+END;
+/
+-- 5) Show results for verification
+PROMPT ===== Borrower table =====
+SELECT Roll_Number, Name, TO_CHAR(Date_of_Issue,'DD-MM-YYYY') Date_of_Issue, Book_Name, Status FROM Borrower ORDER BY Roll_Number;
+PROMPT ===== Fine table =====
+SELECT Roll_No, TO_CHAR(Sys_Date,'DD-MM-YYYY') Sys_Date, Fine FROM Fine ORDER BY Roll_No;

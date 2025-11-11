@@ -1,0 +1,50 @@
+set serveroutput on
+
+create table circle_area(radius number, area number);
+
+declare
+    radiusvar number;
+    areavar number;
+    pi number:=3.14;
+    begin
+    for radiusvar in 5 .. 9 loop
+    areavar:=pi*radiusvar*radiusvar;
+    dbms_output.put_line(areavar);
+    insert into circle_area values(radiusvar, areavar);
+   end loop;
+   end;
+   /
+
+select *from circle_area;
+
+declare
+      radiusvar number := 7;    
+      areavar number;
+      pi number := 3.14;
+    begin
+      while radiusvar <= 14 loop
+        areavar := pi * radiusvar * radiusvar;
+        dbms_output.put_line('Radius: ' || radiusvar || ' Area: ' || areavar);
+        insert into circle_area values(radiusvar, areavar); 
+       radiusvar := radiusvar + 1;
+     end loop;
+   end;
+   /
+
+select *from circle_area;
+
+declare
+      radiusvar number := 3;
+      areavar number;
+      pi number := 3.14;
+    begin
+      loop
+        exit when radiusvar > 7; 
+        areavar := pi * radiusvar * radiusvar;
+       dbms_output.put_line('Radius: ' || radiusvar || ' Area: ' || areavar);
+     insert into circle_area values(radiusvar, areavar);
+       radiusvar := radiusvar + 1;
+     end loop;
+   end;
+   /
+
