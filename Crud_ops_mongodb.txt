@@ -1,0 +1,23 @@
+ db.users.insertOne({name:"Darshan",role:"Student",age:21})
+
+db.users.find()
+
+db.users.insertMany([{name:"Prasad",role:"manager",age:22},{name:"lalit",role:"emplyee",age:23}]);
+
+db.users.find()
+
+db.users.findOne({name:"Darshan"});
+
+db.users.updateOne({name:"Darshan"},{$set:{role:"devloper",age:19}})
+
+db.users.deleteOne({name:"Darshan"})
+
+db.users.find({$or:[{role:"manager"},{role:"emplyee"}]})
+
+db.users.insertOne({name:"Darshan",role:"devloper",age:21})
+
+db.users.find({$and:[{age:{$gt:20}},{age:{$lt:30}}]})
+
+db.users.insertOne({name:"Sourabh",role:"Intern",age:24});
+
+db.users.updateOne({ _id: ObjectId('690f2cac8336232541b7123a')},{$set:{name:"Sunny",role:"president",age:25}})
